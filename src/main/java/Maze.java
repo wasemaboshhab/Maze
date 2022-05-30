@@ -1,10 +1,6 @@
-
-import org.w3c.dom.ls.LSOutput;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Stack;
 
@@ -69,58 +65,7 @@ public class Maze extends JFrame {
             boolean result = false;
             switch (this.algorithm) {
                 case Definitions.ALGORITHM_DFS:
-
-//                    runRecursive(new Node(0, 0));
-
-                    result = traverse(0, 0);
-
-
-//                    Node startNode = new Node(0, 0);
-//                    HashSet<Node> nodesVisited = new HashSet<>();
-//
-//                    Stack<Node> stack = new Stack<>();
-//                    stack.add(startNode);
-//
-//                    while (!stack.isEmpty()) {
-//                        Node currentNode = stack.pop();
-//                        if (!visited[currentNode.getX()][currentNode.getY()]) {
-//                            visited[currentNode.getX()][currentNode.getY()] = true;
-//                            setSquareAsVisited(currentNode.getX(), currentNode.getY(), true);
-//                            nextMoves(currentNode);
-//                            if (!visited[currentNode.getX()][currentNode.getY()]) {
-//                                stack.add(currentNode);
-//                            }
-//                        }
-//                    }
-
-
-//                    (currentNode.isNodeVisited() ? nodesVisited.add(currentNode) : currentNode = neighbors.pop());
-
-
-
-
-
-
-
-
-
-
-//                    Point start = new Point(rows, columns);
-//
-//                    for (int i = 0; i < rows; i++) {
-//                        for (int j = 0; j < columns; j++) {
-//                            if (buttonList.get(j).getBackground().equals(Color.white)) {
-//                                setSquareAsVisited(j, i, true);
-//                            } else {
-//                                setSquareAsVisited(j, i + 1, true);
-//
-//                            }
-//
-//
-//                        }
-//                    }
-
-
+                    result = nextStep(startRow, startColumn);
                     break;
                 case Definitions.ALGORITHM_BFS:
                     break;
@@ -130,81 +75,58 @@ public class Maze extends JFrame {
         }).start();
     }
 
-    public boolean isValidSpot(int row, int column) {
+    private boolean isValidSpot(int row, int column) {
         boolean validSpot = row >= 0 && row < rows && column >= 0 && column < columns && !visited[row][column];
         if (validSpot) {
+//            check if the spot wall
             return values[row][column] == 0;
         }
+//        invalid spot
         return false;
     }
 
-    public boolean traverse(int row, int column) {
-        if (isValidSpot(row , column)) {
-            // it is a valid spot
-            setSquareAsVisited(row, column, true);
+
+    private boolean nextStep(int row, int column) {
+        if (isValidSpot(row, column)) {
             visited[row][column] = true;
-            if (row == rows - 1 && column == columns - 1) {
-                // we solve the maze so return true to the result variable to show (maze solved)
-                return true;
-            }
-//            continue checking
-            // down/deep
-            boolean returnValue = traverse(row +1, column );
+            setSquareAsVisited(row, column, true);
+            //maze solved?
+            if (row == rows - 1 && column == columns - 1) {return true;}
+
+    //            continue checking
+            //down
+            boolean returnValue = nextStep(row + 1, column);
 
             // right
-            if (!returnValue) {returnValue = traverse(row , column +1);}
+            if (!returnValue) {
+                returnValue = nextStep(row, column + 1);
+                setSquareAsVisited(row, column, false);
+            }
 
             // left
-            if (!returnValue) {returnValue = traverse(row , column -1);}
+            if (!returnValue) {
+                returnValue = nextStep(row, column - 1);
+                setSquareAsVisited(row, column, false);
+            }
 
-            //up/back
-            if (!returnValue) {returnValue = traverse(row -1, column );}
+            //up
+            if (!returnValue) {
+                returnValue = nextStep(row - 1, column);
+                setSquareAsVisited(row, column, false);
+            }
+
             return returnValue;
         }
 
+
+
         return false;
 
     }
 
 
-    public void runRecursive(Node node) {
-        if (!visited[node.getX()][node.getY()]) {
-            visited[node.getX()][node.getY()] = true;
-            setSquareAsVisited(node.getX(), node.getY(), visited[node.getX()][node.getY()]);
-            node.setX(node.getY() + 1);
-            if (!visited[node.getX()][node.getY()]) {
-                runRecursive(node);
-            }
-        }
-    }
-
-    private void nextMoves(Node currentNode) {
-//        boolean allowToMoveDown = currentNode.getY() + 1 <= rows && !visited[currentNode.getX()][(currentNode.getY() + 1)];
-//        boolean allowToMoveRight = currentNode.getX() + 1 <= columns && !visited[(int) currentNode.getX() + 1][currentNode.getY()];
-//        boolean allowToMoveLeft = currentNode.getX() - 1 >= 0 && !visited[(currentNode.getX() - 1)][currentNode.getY()];
-//        boolean allowToMoveUp = currentNode.getY() - 1 >= 0 && !visited[currentNode.getX()][(currentNode.getY() - 1)];
-//
-//        if (allowToMoveDown) {
-//            currentNode.setY( (currentNode.getY() + 1));
-//        } else if (allowToMoveRight) {
-//            currentNode.setX( (currentNode.getX() + 1));
-//        } else if (allowToMoveLeft) {
-//            currentNode.setX((currentNode.getX() - 1));
-//        } else if (allowToMoveUp) {
-//            currentNode.setY((currentNode.getY() - 1));
-//        }
-
-        // go down if u can
-        if (currentNode.getX() + 1 < values.length && buttonList.get(currentNode.getX()+1).getBackground().equals(Color.WHITE)) {
-            currentNode.setX(currentNode.getX() + 1);
-//            moveRight
-        }
-//        else if ((currentNode.getY() + 1 < values.length && buttonList.get(currentNode.getY() + 1).getBackground().equals(Color.WHITE))) {
-//            currentNode.setX(currentNode.getY() + 1);
-//        }
 
 
-    }
 
 
     public void setSquareAsVisited(int x, int y, boolean visited) {
